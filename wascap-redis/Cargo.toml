@@ -1,0 +1,21 @@
+[package]
+name = "wascap-redis"
+version = "0.1.0"
+authors = ["Kevin Hoffman <alothien@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+env_logger = "0.6"
+lazy_static = "1.3.0"
+crossbeam-channel = "0.3.8"
+crossbeam = "0.7.1"
+crossbeam-utils = "^0.6.5"
+log = "0.4.6"
+wascap-codec = { path = "../../wascap-codec" }
+prost-types = "0.5.0"
+prost = "0.5.0"
+bytes = "0.4.12"
+redis = "0.10.0"
