@@ -6,3 +6,9 @@ matrix:
   allow_failures:
     - rust: nightly
 fast_finish: true
+
+deploy:
+  provider: script
+  script: bash docker_push
+  on:
+    branch: master
