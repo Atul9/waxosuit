@@ -20,7 +20,7 @@ Then, run `make docker` to trigger the build of the docker image using the newly
 
 # Running
 
-To run Waxosuit, you can either use the Docker image or run it directly. Running it directly, you must specify the directory where the capability provider plugins are and the path to the guest module (.wasm file):
+To run Waxosuit, you can either use the [Docker image](https://hub.docker.com/r/waxosuit/waxosuit) or run it directly. Running it directly, you must specify the directory where the capability provider plugins are and the path to the guest module (.wasm file):
 
 ```
 $ waxosuit myservice.wasm -c ./capabilities
