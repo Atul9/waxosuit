@@ -28,6 +28,12 @@ print:
 	@echo VENDOR=${VENDOR}
 
 build:
+	cargo build
+
+release:
+	cargo build --release
+
+docker:
 	docker build -t waxosuit/waxosuit --build-arg VERSION="${VERSION}" \
 	--build-arg BUILD_DATE="${BUILD_DATE}" \
 	--build-arg VCS_URL="${VCS_URL}" \
