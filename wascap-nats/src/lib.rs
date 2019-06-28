@@ -32,12 +32,14 @@ use wascap_codec::AsCommand;
 
 capability_provider!(NatsProvider, NatsProvider::new);
 
+const CAPABILITY_ID: &'static str = "wascap:messaging";
 const ENV_NATS_SUBSCRIPTION: &'static str = "NATS_SUBSCRIPTION";
 const ENV_NATS_URL: &'static str = "NATS_URL";
 
 pub struct NatsProvider {
     dispatcher: Arc<RwLock<Box<Dispatcher>>>,
     client: nats::Client,
+    nats_url: String,
 }
 
 impl NatsProvider {
@@ -49,26 +51,25 @@ impl NatsProvider {
             Err(_) => "nats://localhost:4222".to_string(),
         };
 
-        info!("Attempting to establish NATS connection to URL: {}", nats_url);
 
         let opts = nats::ClientOptions::builder()
-            .cluster_uris(vec![nats_url])
+            .cluster_uris(vec![nats_url.clone()])
             .authentication(nats::AuthenticationStyle::Anonymous)
             .build()
             .unwrap();
-        let c = nats::Client::from_options(opts).unwrap();
-        c.connect().unwrap();
+        let c = nats::Client::from_options(opts).unwrap();        
 
         NatsProvider {
             dispatcher: Arc::new(RwLock::new(Box::new(NullDispatcher::new()))),
             client: c,
+            nats_url: nats_url,
         }
     }
 
     fn handle_command(&self, cmd: &prost_types::Any) -> Result<Event, Box<dyn Error>> {
         match cmd.type_url.as_ref() {
             TYPE_URL_PUBLISH_MESSAGE => self.publish_message(&cmd.value),
-            _ => Ok(Event::bad_dispatch("unsupported type url")),
+            _ => Ok(Event::bad_dispatch("Unsupported type url")),
         }
     }
 
@@ -107,7 +108,7 @@ impl NatsProvider {
 
 impl CapabilityProvider for NatsProvider {
     fn capability_id(&self) -> &'static str {
-        "wascap:messaging"
+        CAPABILITY_ID
     }
 
     fn configure_dispatch(
@@ -118,6 +119,9 @@ impl CapabilityProvider for NatsProvider {
         info!("Dispatcher received.");
         let mut lock = self.dispatcher.write().unwrap();
         *lock = dispatcher;
+
+        info!("Attempting to establish NATS connection to URL: {}", self.nats_url);
+        self.client.connect().unwrap();
 
         let disp = self.dispatcher.clone();
 

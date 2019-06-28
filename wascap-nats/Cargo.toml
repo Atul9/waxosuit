@@ -1,6 +1,6 @@
 [package]
 name = "wascap-nats"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Kevin Hoffman <alothien@gmail.com>"]
 edition = "2018"
 
@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wascap-codec = { path = "../../wascap-codec" }
+wascap-codec = "0.0.2"
 log = "0.4.6"
 env_logger = "0.6"
 crossbeam-channel = "0.3.8"

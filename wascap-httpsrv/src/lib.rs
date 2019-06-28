@@ -68,6 +68,11 @@ impl CapabilityProvider for HttpServerProvider {
 
         let disp = self.dispatcher.clone();
 
+        let bind_addr = match std::env::var("PORT") {
+            Ok(v) => format!("0.0.0.0:{}", v),
+            Err(_) => "0.0.0.0:8080".to_string(),
+        };
+
         std::thread::spawn(move || {
             HttpServer::new(move || {
                 App::new()
@@ -79,7 +84,7 @@ impl CapabilityProvider for HttpServerProvider {
                     .service(web::resource("/liveupdate").route(web::post().to_async(upload)))
                     .default_service(web::route().to(request_handler))
             })
-            .bind("0.0.0.0:8080")
+            .bind(bind_addr)
             .unwrap()
             .disable_signals()
             .run()
@@ -127,7 +132,7 @@ fn health_check(state: web::Data<Arc<RwLock<Box<Dispatcher>>>>) -> HttpResponse 
 
 fn show_claims(
     state: web::Data<codec::capabilities::ModuleIdentity>,
-    req: HttpRequest,
+    _req: HttpRequest,
 ) -> HttpResponse {
     HttpResponse::Ok().json(state.get_ref())
 }
@@ -186,7 +191,7 @@ fn dispatch_module(newmodule: &[u8], state: &web::Data<Arc<RwLock<Box<Dispatcher
     let update = codec::core::LiveUpdate {
         new_module: newmodule.to_vec(),
     };
-    let cmd = update.as_command("wascap:http_server", "guest");
+    let cmd = update.as_command(CAPABILITY_ID, "guest");
     let _evt = {
         let lock = (*state).read().unwrap();
         lock.dispatch(&cmd).unwrap()
@@ -205,7 +210,7 @@ fn request_handler(
         header: extract_headers(&req),
         body: payload.to_vec(),
     };
-    let cmd = request.as_command("wascap:http_server", "guest");
+    let cmd = request.as_command(CAPABILITY_ID, "guest");
 
     let evt = {
         let lock = (*state).read().unwrap();

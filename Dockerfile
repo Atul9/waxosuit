@@ -14,10 +14,10 @@
 
 FROM frolvlad/alpine-glibc
 
-COPY ./waxosuit/target/release/waxosuit /
-COPY ./waxosuit/target/release/libwascap_redis.so /caps/
-COPY ./waxosuit/target/release/libwascap_nats.so /caps/
-COPY ./waxosuit/target/release/libwascap_httpsrv.so /caps/
+COPY ./target/release/waxosuit /
+COPY ./target/release/libwascap_redis.so /caps/
+COPY ./target/release/libwascap_nats.so /caps/
+COPY ./target/release/libwascap_httpsrv.so /caps/
 
 EXPOSE 8080
 

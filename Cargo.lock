@@ -2993,20 +2993,7 @@ dependencies = [
 
 [[package]]
 name = "wascap-codec"
-version = "0.0.1"
-dependencies = [
- "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
- "prost 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "prost-build 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "prost-types 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.92 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.92 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.39 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "wascap-codec"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3033,12 +3020,12 @@ dependencies = [
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "prost 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "prost-types 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "wascap-codec 0.0.1",
+ "wascap-codec 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "wascap-nats"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossbeam 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "crossbeam-channel 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3047,7 +3034,7 @@ dependencies = [
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "natsclient 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "prost-types 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "wascap-codec 0.0.1",
+ "wascap-codec 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3064,7 +3051,7 @@ dependencies = [
  "prost 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "prost-types 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "redis 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "wascap-codec 0.0.1",
+ "wascap-codec 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -3171,7 +3158,7 @@ dependencies = [
  "structopt 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "term-table 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wascap 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "wascap-codec 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wascap-codec 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmer-runtime 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmer-runtime-core 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -3602,7 +3589,7 @@ dependencies = [
 "checksum walkdir 2.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "9d9d7ed3431229a144296213105a390676cc49c9b6a72bd19f3176c98e129fa1"
 "checksum want 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "797464475f30ddb8830cc529aaaae648d581f99e2036a928877dfde027ddf6b3"
 "checksum wascap 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "047fd3b5ca6e6fe544712381687e65a85ada771966519b411318b0a93dec4be5"
-"checksum wascap-codec 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "dd2db00185af71775a633a93b129d463970b35d87c4972374c32bbbad0d752c5"
+"checksum wascap-codec 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "96dd38dffa5b07341493209544819e7552429f5698615be10c9eb67ab1044f14"
 "checksum wasmer-clif-backend 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "8f6b03083b0970238ae427d79a26795bc4fb2ef11745840314f95a5f66600ef7"
 "checksum wasmer-runtime 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "cbde16b1a3665dadc79182a41553731ecba3111b1e6429fff14bcc4515e849f5"
 "checksum wasmer-runtime-core 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7b92f733aa4e173165b7ce7494dcbec6c81e207ac9fd5dcf489329f393f1f083"

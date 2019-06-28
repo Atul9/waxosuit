@@ -34,6 +34,7 @@ use wascap_codec::keyvalue;
 use wascap_codec::AsEvent;
 
 const ENV_REDIS_URL: &'static str = "REDIS_URL";
+const CAPABILITY_ID: &'static str = "wascap:keyvalue";
 
 capability_provider!(RedisKVProvider, RedisKVProvider::new);
 
@@ -96,10 +97,13 @@ impl RedisKVProvider {
 
     fn get(&self, req: GetRequest) -> Result<Event, Box<dyn Error>> {
         let con = self.client.get_connection()?;
-        let v: redis::RedisResult<String> = con.get(req.key);
+        let v: redis::RedisResult<String> = con.get(&req.key);
         Ok(match v {
             Ok(s) => GetResponse{value: s, exists: true},
-            Err(_) => GetResponse{value: "".to_string(), exists: false}
+            Err(e) => {
+                eprint!("GET for {} failed: {}", &req.key, e);    
+                GetResponse{value: "".to_string(), exists: false}
+            }
         }.as_event(true, None))
     }
 
@@ -132,7 +136,7 @@ impl RedisKVProvider {
 
 impl CapabilityProvider for RedisKVProvider {
     fn capability_id(&self) -> &'static str {
-        "wascap:keyvalue"
+        CAPABILITY_ID
     }
 
     fn configure_dispatch(

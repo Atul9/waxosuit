@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wascap-codec = { path = "../../wascap-codec" }
+wascap-codec = "0.0.2"
 actix-web = "1.0.0-beta.4"
 actix-multipart = "0.1.1"
 futures = "0.1.27"

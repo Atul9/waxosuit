@@ -72,12 +72,12 @@ impl CapabilityManager {
         match self.claims {
             Some(ref c) => codec::capabilities::ModuleIdentity {
                 issuer: c.issuer.clone(),
-                module_name: c.subject.clone(),
+                module: c.subject.clone(),
                 capabilities: c.caps.as_ref().map_or(vec![], |cps| cps.clone()),
             },
             None => codec::capabilities::ModuleIdentity {
                 issuer: "invalid".to_string(),
-                module_name: "invalid".to_string(),
+                module: "invalid".to_string(),
                 capabilities: vec![],
             },
         }

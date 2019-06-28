@@ -14,7 +14,7 @@ crossbeam = "0.7.1"
 crossbeam-utils = "^0.6.5"
 #wascap-codec = { path = "../../wascap-codec" }
 #wascap = { path = "../../wascap" }
-wascap-codec = "0.0.1"
+wascap-codec = "0.0.2"
 wascap = "0.0.1"
 wasmer-runtime = "0.4.1"
 wasmer-runtime-core = "0.4.1"
