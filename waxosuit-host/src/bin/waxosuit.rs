@@ -137,7 +137,8 @@ fn check_token_with_opa(args: &Cli, jwt: String) -> waxosuit_host::Result<()> {
             info!("OPA validation DENIED");
             Err(waxosuit_host::errors::new(
                 waxosuit_host::errors::ErrorKind::WascapViolation(
-                    "OPA denied this module".to_string(),
+                    format!("OPA denied this module: {}",
+                        oparesult.cause.join("/")),
                 ),
             ))
         }
@@ -209,4 +210,5 @@ struct OpaInput {
 #[derive(Serialize, Deserialize, Debug)]
 struct OpaReply {
     allow: bool,
+    cause: Vec<String>,
 }
