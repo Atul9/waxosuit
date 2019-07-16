@@ -35,6 +35,8 @@ pub enum ErrorKind {
     HostCallFailure(Box<dyn StdError>),
     HttpClientFailure(reqwest::Error),
     Json(serde_json::error::Error),
+    CapabilityProviderError(String),
+    TokenValidationError(String),
 }
 
 impl Error {
@@ -61,6 +63,8 @@ impl StdError for Error {
             ErrorKind::HostCallFailure(_) => "Error occurred during host call",
             ErrorKind::HttpClientFailure(_) => "HTTP client error",
             ErrorKind::Json(_) => "JSON encoding/decoding failure",
+            ErrorKind::CapabilityProviderError(_) => "Capability provider error",
+            ErrorKind::TokenValidationError(_) => "Token validation error",
         }
     }
 
@@ -77,6 +81,8 @@ impl StdError for Error {
             ErrorKind::HostCallFailure(_) => None,
             ErrorKind::HttpClientFailure(ref err) => Some(err),
             ErrorKind::Json(ref err) => Some(err),
+            ErrorKind::CapabilityProviderError(_) => None,
+            ErrorKind::TokenValidationError(_) => None,
         }
     }
 }
@@ -102,6 +108,8 @@ impl fmt::Display for Error {
             }
             ErrorKind::HttpClientFailure(ref err) => write!(f, "HTTP client error: {}", err),
             ErrorKind::Json(ref err) => write!(f, "JSON error: {}", err),
+            ErrorKind::CapabilityProviderError(ref desc) => write!(f, "Capability provider error: {}", desc),
+            ErrorKind::TokenValidationError(ref reason) => write!(f, "Token validation error: {}", reason),
         }
     }
 }

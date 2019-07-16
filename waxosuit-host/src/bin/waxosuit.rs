@@ -23,6 +23,7 @@ use wascap::jwt::validate_token;
 use wascap::jwt::Claims;
 use waxosuit_host::wasm::ModuleHost;
 use waxosuit_host::capabilities::CAPMAN;
+use waxosuit_host::errors as hosterrors;
 
 
 #[derive(Debug, StructOpt, Clone)]
@@ -55,13 +56,13 @@ struct Cli {
 
 fn main() -> Result<(), Box<dyn ::std::error::Error>> {
     let args = Cli::from_args();
-    let inputfile = &args.input;
+    let inputfile: &PathBuf = &args.input;
     env_logger::init();
 
     let buf = {
-        let mut wfile = File::open(inputfile).unwrap();
+        let mut wfile = File::open(inputfile)?;
         let mut buf = Vec::new();
-        wfile.read_to_end(&mut buf).unwrap();
+        wfile.read_to_end(&mut buf)?;
         buf
     };
 
@@ -72,28 +73,32 @@ fn main() -> Result<(), Box<dyn ::std::error::Error>> {
             let validate_res = validate_token(&token.jwt)?;
             if validate_res.cannot_use_yet {
                 eprint!(
-                    "Will not load WebAssembly module. Token is currently unusable. It will be usable {}",
+                    "Will not load WebAssembly module. Token is currently unusable. It will be usable {}\n",
                     validate_res.not_before_human
                 );
-                Ok(())
+                Err(Box::new(hosterrors::new(hosterrors::ErrorKind::TokenValidationError("Token is not usable yet".to_string()))))
             } else if validate_res.expired {
                 eprint!(
-                    "Will not load WebAssembly module. Token expired {}",
+                    "Will not load WebAssembly module. Token expired {}\n",
                     validate_res.expires_human
                 );
-                Ok(())
+                Err(Box::new(hosterrors::new(hosterrors::ErrorKind::TokenValidationError("Token is expired".to_string()))))
             } else {
                 check_token_with_opa(&args, token.jwt)?;
-                start(&args, token.claims, buf).unwrap();
-                Ok(())
+                match start(&args, token.claims, buf) {
+                    Ok(_) => Ok(()),
+                    Err(e) => {
+                        eprint!("Failed to start host runtime. ");
+                        Err(Box::new(e))
+                    }
+                }
             }
         }
         Ok(None) => {
-            eprint!("No capability signature found");
-            Ok(())
+            Err(Box::new(hosterrors::new(hosterrors::ErrorKind::TokenValidationError("No capability signature in module".to_string()))))
         }
         Err(e) => {
-            eprint!("Error reading capabilities from file: {}", e);
+            eprint!("Error reading capabilities from file: {}\n", e);
             Err(Box::new(e))
         }
     }
@@ -104,18 +109,23 @@ fn start(args: &Cli, claims: Claims, buf: Vec<u8>) -> waxosuit_host::Result<()> 
         let mut capman = CAPMAN.write().unwrap();
         capman.set_claims(claims.clone());
     }
-    add_capabilities(&args.caps_dir, &claims.caps);
+    add_capabilities(&args.caps_dir);
 
     let module_name: &str = args.input.file_stem().unwrap_or_default().to_str().unwrap();
 
     info!(
-        "Starting Waxosuit for module {} with capability claims - {}",
+        "Starting Waxosuit Runtime Host for module {} with capability claims - {}",
         module_name,
         claims.caps.map_or("none".to_string(), |c| c.join(", "))
     );
 
     {
         let lock = CAPMAN.read().unwrap();
+        if lock.empty() {
+            return Err(waxosuit_host::errors::new(waxosuit_host::errors::ErrorKind::CapabilityProviderError(
+                "No capability providers were discovered".to_string()
+            )));
+        }
         lock.start_mux(move || {
             let host = ModuleHost::new(&buf).unwrap();
             Ok(host)
@@ -170,7 +180,7 @@ pub fn post_json(url: &str, token: &str) -> waxosuit_host::Result<String> {
     }
 }
 
-fn add_capabilities(caps_dir: &PathBuf, caps: &Option<Vec<String>>) {
+fn add_capabilities(caps_dir: &PathBuf) {
     if caps_dir.is_dir() {
         for entry in read_dir(caps_dir).unwrap() {
             let entry = entry.unwrap();
