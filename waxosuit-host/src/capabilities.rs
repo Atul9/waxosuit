@@ -47,6 +47,10 @@ impl CapabilityManager {
         }
     }
 
+    pub fn empty(&self) -> bool {
+        self.loaded_libraries.len() == 0
+    }
+
     pub fn call(&self, cmd: &Command) -> Result<Event> {
         let capability = self.plugins.get(&cmd.target_cap).unwrap();
 
