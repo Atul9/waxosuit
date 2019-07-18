@@ -189,10 +189,8 @@ fn add_capabilities(caps_dir: &PathBuf) {
                 match path.extension().map(|ex| ex.to_str().unwrap()) {
                     Some("dylib") | Some("so") => {
                         let result = {
-                            unsafe {
                                 let mut capman = CAPMAN.write().unwrap();
                                 capman.load_plugin(path)
-                            }
                         };
                         match result {
                             Ok(capid) => {

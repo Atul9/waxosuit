@@ -87,7 +87,7 @@ impl CapabilityManager {
         }
     }
 
-    pub unsafe fn load_plugin<P: AsRef<OsStr>>(&mut self, filename: P) -> Result<String> {
+    pub fn load_plugin<P: AsRef<OsStr>>(&mut self, filename: P) -> Result<String> {
         type PluginCreate = unsafe fn() -> *mut CapabilityProvider;
 
         let lib = Library::new(filename.as_ref())?;
@@ -99,10 +99,12 @@ impl CapabilityManager {
 
         let lib = self.loaded_libraries.last().unwrap();
 
-        let constructor: Symbol<PluginCreate> = lib.get(b"__capability_provider_create")?;
-        let boxed_raw = constructor();
+        let plugin = unsafe {
+            let constructor: Symbol<PluginCreate> = lib.get(b"__capability_provider_create")?;
+            let boxed_raw = constructor();
 
-        let plugin = Box::from_raw(boxed_raw);
+            Box::from_raw(boxed_raw)
+        };
         info!(
             "Loaded capability: {}, provider: {}",
             plugin.capability_id(),
@@ -122,14 +124,15 @@ impl CapabilityManager {
             if let Some(ref caps) = claims.caps {
                 if !caps.contains(&capid) {
                     let lib = self.loaded_libraries.pop();
-                    drop(lib); // Could let this go out of scope, but I wanted to be explicit here
+                    drop(plugin);
+                    drop(lib); 
                     info!(
                         "Capability provider for {} not claimed by guest module. Unloading.",
-                        capid
+                        &capid
                     );
                     return Err(errors::new(errors::ErrorKind::WascapViolation(format!(
                         "Unauthorized capability: {}",
-                        capid
+                        &capid
                     ))));
                 }
             }
@@ -138,7 +141,6 @@ impl CapabilityManager {
         let (evt_s, evt_r) = channel::unbounded();
         let (cmd_s, cmd_r) = channel::unbounded();
         let spatch = WaxosuitDispatcher::new(evt_r, cmd_s);
-
 
         self.muxer
             .register_capability(plugin.capability_id(), cmd_r, evt_s)?;

@@ -16,12 +16,9 @@ use crate::capabilities::CAPMAN;
 use crate::errors;
 use crate::Result;
 use prost::Message;
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
 use wascap_codec as codec;
 use wascap_codec::core::{Command, Event};
-use wasmer_runtime::{error, func, imports, instantiate, Ctx, Func, Instance, Memory, Value};
-use wasmer_runtime_core::Module;
+use wasmer_runtime::{func, imports, instantiate, Ctx, Func, Instance, Memory };
 
 const HOST_NAMESPACE: &'static str = "wascap";
 const HOST_THROW: &'static str = "__throw";
@@ -35,8 +32,6 @@ const GUEST_CALL: &'static str = "__guest_call";
 const GUEST_GLOBAL_ARGUMENT_POINTER: &'static str = "__wascap_global_argument_ptr";
 
 pub struct ModuleHost {
-    // TODO: make this a pool of instances so we can deliver dispatch messages
-    // round-robin to them
     instance: Instance,
 }
 
@@ -68,6 +63,7 @@ impl ModuleHost {
 
         let resvec = self.get_vec_at_gp(lenresult);
         let res_event = codec::core::Event::decode(&resvec)?;
+        self.guest_free_fn()?.call(ptr, cmd.encoded_len() as _)?;
 
         Ok(res_event)
     }
@@ -251,7 +247,7 @@ fn console_log(ctx: &mut Ctx, ptr: i32, len: i32) {
     info!("Wasm Guest: {}", std::str::from_utf8(&vec).unwrap());
 }
 
-fn throw(ctx: &mut Ctx, ptr: i32, b: i32) -> () {
+fn throw(_ctx: &mut Ctx, _ptr: i32, _b: i32) -> () {
     println!("Module threw an exception!");
     std::process::abort();
 }
