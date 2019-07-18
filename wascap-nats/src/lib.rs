@@ -37,6 +37,7 @@ const CAPABILITY_ID: &'static str = "wascap:messaging";
 const ENV_NATS_SUBSCRIPTION: &'static str = "NATS_SUBSCRIPTION";
 const ENV_NATS_URL: &'static str = "NATS_URL";
 const ENV_NATS_CLIENT_JWT: &'static str = "NATS_CLIENT_JWT";
+const ENV_NATS_CLIENT_SEED: &'static str = "NATS_CLIENT_SEED";
 const ENV_NATS_QUEUEGROUP_NAME: &'static str = "NATS_QUEUEGROUP_NAME";
 
 pub struct NatsProvider {
@@ -155,7 +156,10 @@ fn delivermessage_for_natsmessage(msg: &Message) -> DeliverMessage {
 
 fn determine_authentication() -> AuthenticationStyle {
   match std::env::var(ENV_NATS_CLIENT_JWT) {
-    Ok(client_jwt) => AuthenticationStyle::Token(client_jwt),
+      Ok(client_jwt) => match std::env::var(ENV_NATS_CLIENT_SEED) {
+          Ok(client_seed) => AuthenticationStyle::UserCredentials(client_jwt, client_seed),
+          Err(_) => panic!("Missing client seed, required for user credentials (JWT) authentication.")
+      }
     Err(_) => AuthenticationStyle::Anonymous,
   }
 }
