@@ -31,7 +31,7 @@ lazy_static! {
 }
 
 pub struct CapabilityManager {
-    plugins: HashMap<String, Box<CapabilityProvider>>,
+    plugins: HashMap<String, Box<dyn CapabilityProvider>>,
     loaded_libraries: Vec<Library>,
     muxer: Multiplexer,
     claims: Option<wascap::jwt::Claims>,
@@ -88,7 +88,7 @@ impl CapabilityManager {
     }
 
     pub fn load_plugin<P: AsRef<OsStr>>(&mut self, filename: P) -> Result<String> {
-        type PluginCreate = unsafe fn() -> *mut CapabilityProvider;
+        type PluginCreate = unsafe fn() -> *mut dyn CapabilityProvider;
 
         let lib = Library::new(filename.as_ref())?;
 

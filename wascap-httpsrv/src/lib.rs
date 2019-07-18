@@ -39,7 +39,7 @@ const CAPABILITY_ID: &'static str = "wascap:http_server";
 capability_provider!(HttpServerProvider, HttpServerProvider::new);
 
 pub struct HttpServerProvider {
-    dispatcher: Arc<RwLock<Box<Dispatcher>>>,
+    dispatcher: Arc<RwLock<Box<dyn Dispatcher>>>,
 }
 
 impl HttpServerProvider {
@@ -58,7 +58,7 @@ impl CapabilityProvider for HttpServerProvider {
 
     fn configure_dispatch(
         &self,
-        dispatcher: Box<Dispatcher>,
+        dispatcher: Box<dyn Dispatcher>,
         module_id: codec::capabilities::ModuleIdentity,
     ) -> Result<(), Box<dyn StdError>> {
         info!("Dispatcher received.");
@@ -110,7 +110,7 @@ impl CapabilityProvider for HttpServerProvider {
     }
 }
 
-fn health_check(state: web::Data<Arc<RwLock<Box<Dispatcher>>>>) -> HttpResponse {
+fn health_check(state: web::Data<Arc<RwLock<Box<dyn Dispatcher>>>>) -> HttpResponse {
     let check = codec::core::HealthRequest { placeholder: true }.as_command(CAPABILITY_ID, "guest");
     let evt = {
         let lock = (*state).read().unwrap();
@@ -139,7 +139,7 @@ fn show_claims(
 
 fn upload(
     multipart: Multipart,
-    state: web::Data<Arc<RwLock<Box<Dispatcher>>>>,
+    state: web::Data<Arc<RwLock<Box<dyn Dispatcher>>>>,
 ) -> impl Future<Item = HttpResponse, Error = Error> {
     multipart
         .map_err(actix_web::error::ErrorInternalServerError)
@@ -155,7 +155,7 @@ fn upload(
 
 fn save_file(
     field: Field,
-    state: &web::Data<Arc<RwLock<Box<Dispatcher>>>>,
+    state: &web::Data<Arc<RwLock<Box<dyn Dispatcher>>>>,
 ) -> impl Future<Item = i64, Error = Error> {
     let ns = state.clone();
     field
@@ -187,7 +187,7 @@ fn save_file(
         })
 }
 
-fn dispatch_module(newmodule: &[u8], state: &web::Data<Arc<RwLock<Box<Dispatcher>>>>) {
+fn dispatch_module(newmodule: &[u8], state: &web::Data<Arc<RwLock<Box<dyn Dispatcher>>>>) {
     let update = codec::core::LiveUpdate {
         new_module: newmodule.to_vec(),
     };
@@ -201,7 +201,7 @@ fn dispatch_module(newmodule: &[u8], state: &web::Data<Arc<RwLock<Box<Dispatcher
 fn request_handler(
     req: HttpRequest,
     payload: Bytes,
-    state: web::Data<Arc<RwLock<Box<Dispatcher>>>>,
+    state: web::Data<Arc<RwLock<Box<dyn Dispatcher>>>>,
 ) -> HttpResponse {
     let request = codec::http::Request {
         method: req.method().as_str().to_string(),

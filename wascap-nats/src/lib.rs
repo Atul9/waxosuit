@@ -41,7 +41,7 @@ const ENV_NATS_CLIENT_SEED: &'static str = "NATS_CLIENT_SEED";
 const ENV_NATS_QUEUEGROUP_NAME: &'static str = "NATS_QUEUEGROUP_NAME";
 
 pub struct NatsProvider {
-  dispatcher: Arc<RwLock<Box<Dispatcher>>>,
+  dispatcher: Arc<RwLock<Box<dyn Dispatcher>>>,
   client: nats::Client,
   nats_url: String,
 }
@@ -171,7 +171,7 @@ impl CapabilityProvider for NatsProvider {
 
   fn configure_dispatch(
     &self,
-    dispatcher: Box<Dispatcher>,
+    dispatcher: Box<dyn Dispatcher>,
     _id: codec::capabilities::ModuleIdentity,
   ) -> Result<(), Box<dyn Error>> {
     info!("Dispatcher received.");

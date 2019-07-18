@@ -39,7 +39,7 @@ const CAPABILITY_ID: &'static str = "wascap:keyvalue";
 capability_provider!(RedisKVProvider, RedisKVProvider::new);
 
 pub struct RedisKVProvider {
-    dispatcher: Arc<RwLock<Box<Dispatcher>>>,
+    dispatcher: Arc<RwLock<Box<dyn Dispatcher>>>,
     client: redis::Client,
 }
 
@@ -141,7 +141,7 @@ impl CapabilityProvider for RedisKVProvider {
 
     fn configure_dispatch(
         &self,
-        dispatcher: Box<Dispatcher>,
+        dispatcher: Box<dyn Dispatcher>,
         _id: codec::capabilities::ModuleIdentity,
     ) -> Result<(), Box<dyn Error>> {
         info!("Dispatcher received.");
